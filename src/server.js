@@ -15,7 +15,7 @@ if (process.env.MONGOLAB_URI) {
 mongoose.connect(mongoURI, function(err) {
     if (err) {
         console.error("Connection to DB (" + mongoURI + ") error: " + err + "\n");
-        process.exit();     //App needs db so we exit when not present
+        process.exit(); //App needs db so we exit when not present
     } else {
         console.log("Connection to DB (" + mongoURI + ") successful \n");
     }
