@@ -31,7 +31,8 @@
   "homepage": "https://gitlab.com/mukundbhudia/auth-gateway-api#README",
   "dependencies": {
     "restify": "~5.2.0",
-    "bcrypt": "~1.0.3"
+    "bcrypt": "~1.0.3",
+    "mongoose": "~4.11.8"
   },
   "devDependencies": {
     "jasmine": "^2.4.1",
