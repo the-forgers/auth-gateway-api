@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const port = 5000 || process.env.PORT;
 
 const userUtils = require('./lib/userUtils')
+const jwtUtils = require('./lib/jwtUtils')
 
 let mongoURI = 'mongodb://localhost/auth-gateway';
 
@@ -44,16 +45,16 @@ async function register(req, res, next) {
 async function login(req, res, next) {
   const reqBody = req.body;
   try {
-    const loginStatus = await userUtils.login(reqBody.email, reqBody.password);
-    if (loginStatus === true) {
+    const loginToken = await userUtils.login(reqBody.email, reqBody.password);
+    if (loginToken !== null) {
       res.send(200, {
         'msg': 'loginSuccess',
-        'status': loginStatus
+        'token': loginToken
       });
     } else {
       res.send(401, {
         'msg': 'loginFailure, check username/password',
-        'status': loginStatus
+        'token': loginToken
       });
     }
   } catch (err) {
@@ -62,11 +63,29 @@ async function login(req, res, next) {
   }
 }
 
+async function checkToken(req, res, next) {
+  const token = req.body.token || req.query.token || req.headers['x-access-token'];
+  const email = req.body.email || req.query.email || req.headers['x-access-email'];
+  const isTokenValid = await jwtUtils.isValidToken(token, email);
+  if (isTokenValid === true) {
+    res.send(200, {
+      'msg': 'tokenValid'
+    });
+    return next();
+  } else {
+    res.send(403, { 
+      'msg': 'tokenInValid',
+      'error': isTokenValid
+  });
+  }
+}
+
 const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 server.get('/status', status);
 server.post('/register', register);
 server.post('/login', login);
+server.post('/checkToken', checkToken);
 
 server.listen(port, () => {
   console.log(`${server.name} listening at ${server.url}`);

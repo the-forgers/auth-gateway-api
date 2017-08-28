@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const auth = require('./auth')
+const jwtUtils = require('./jwtUtils')
 
 async function register(firstName, lastName, email, password) {
   let userToRegister = null;
@@ -23,13 +24,15 @@ async function login(email, password) {
     const doesPasswordMatch = await auth.checkPassword(password, dbHashedPassword);
     if (doesPasswordMatch === true) {
       console.log(`User with email ${email} has supplied correct password`);
+      const token = await jwtUtils.issueToken(foundUser);
+      return token;
     } else {
       console.log(`User with email ${email} has supplied incorrect password`);
+      return null;
     }
-    return doesPasswordMatch;
   } else {
     console.log(`Cannot find user with email: ${email}`);
-    return false;
+    return null;
   }
 }
 
