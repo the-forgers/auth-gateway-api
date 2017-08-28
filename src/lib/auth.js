@@ -35,16 +35,13 @@ hash stored on the db.
 * @param  {String}   dbHashedPassword   stored hashed password
 * @return {Function}                    callbacks
 */
-const checkPassword = function(givenPassword, dbHashedPassword) {
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(givenPassword, dbHashedPassword, function(err, res) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(res);
-      }
-    });
-  });
+const checkPassword = async function(givenPassword, dbHashedPassword) {
+  try {
+    return await bcrypt.compare(givenPassword, dbHashedPassword);
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
 };
 
 module.exports = {

@@ -16,6 +16,24 @@ async function register(firstName, lastName, email, password) {
   return await userToSave.save();
 }
 
+async function login(email, password) {
+  const foundUser = await User.findOne({email: email});
+  if (foundUser !== null && foundUser.email === email) {
+    const dbHashedPassword = foundUser.password;
+    const doesPasswordMatch = await auth.checkPassword(password, dbHashedPassword);
+    if (doesPasswordMatch === true) {
+      console.log(`User with email ${email} has supplied correct password`);
+    } else {
+      console.log(`User with email ${email} has supplied incorrect password`);
+    }
+    return doesPasswordMatch;
+  } else {
+    console.log(`Cannot find user with email: ${email}`);
+    return false;
+  }
+}
+
 module.exports = {
-  register: register
+  register: register,
+  login: login
 };

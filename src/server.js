@@ -41,10 +41,32 @@ async function register(req, res, next) {
   return next();
 }
 
+async function login(req, res, next) {
+  const reqBody = req.body;
+  try {
+    const loginStatus = await userUtils.login(reqBody.email, reqBody.password);
+    if (loginStatus === true) {
+      res.send(200, {
+        'msg': 'loginSuccess',
+        'status': loginStatus
+      });
+    } else {
+      res.send(401, {
+        'msg': 'loginFailure, check username/password',
+        'status': loginStatus
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.send(500, err);
+  }
+}
+
 const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 server.get('/status', status);
 server.post('/register', register);
+server.post('/login', login);
 
 server.listen(port, () => {
   console.log('%s listening at %s', server.name, server.url);
