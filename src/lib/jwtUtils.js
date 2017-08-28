@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
-const privateCert = fs.readFileSync('auth-gateway');
-const publicCert = fs.readFileSync('auth_pub.pem');
+const privateCert = fs.readFileSync('auth-gateway-cert');
+const publicCert = fs.readFileSync('auth-gateway-cert.pem');
 const TOKEN_EXPIRATION_TIME = 1200 //in seconds
 
 async function issueToken(userData) {
