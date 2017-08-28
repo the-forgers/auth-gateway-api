@@ -1,24 +1,19 @@
 const User = require('../models/user')
+const auth = require('./auth')
 
-register = function (firstName, lastName, email, password) {
-  return new Promise((resolve, reject) => {
-    const userToRegister = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password
-    }
-    userToSave = new User(userToRegister);
-    userToSave.save((err, savedUser) => {
-      if (err) {
-        console.error(err)
-        return reject(err)
-      } else {
-        console.log(`Saved user with email ${email}`)
-        return resolve(savedUser);
-      }
-    });
-  });
+async function register(firstName, lastName, email, password) {
+  let userToRegister = null;
+  let hPassword = null;
+  hPassword = await auth.generatePassword(password);
+  console.log(hPassword);
+  userToRegister = {
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    password: hPassword
+  }
+  userToSave = new User(userToRegister);
+  return await userToSave.save();
 }
 
 module.exports = {

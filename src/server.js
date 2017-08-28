@@ -35,6 +35,7 @@ async function register(req, res, next) {
     const savedUser = await userUtils.register(reqBody.firstName, reqBody.lastName, reqBody.email, reqBody.password);
     res.send(201, savedUser);
   } catch (err) {
+    console.error(err);
     res.send(500, err);
   }
   return next();
