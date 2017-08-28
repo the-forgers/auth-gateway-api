@@ -1,11 +1,14 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
-const secret = 'secret1234';
-const TOKEN_EXPIRATION_TIME = 300 //seconds
+const privateCert = fs.readFileSync('auth-gateway');
+const publicCert = fs.readFileSync('auth_pub.pem');
+const TOKEN_EXPIRATION_TIME = 1200 //in seconds
 
 async function issueToken(userData) {
-  const token = await jwt.sign(userData, secret, {
-    expiresIn: TOKEN_EXPIRATION_TIME // expires in 24 hours
+  const token = await jwt.sign(userData, privateCert, {
+    algorithm: 'RS512',
+    expiresIn: TOKEN_EXPIRATION_TIME
   });
   return token;
 }
@@ -13,8 +16,7 @@ async function issueToken(userData) {
 async function isValidToken(token, emailToVerify) {
   if (token) {
     try {
-      const decoded = await jwt.verify(token, secret);
-      console.log(decoded);
+      const decoded = await jwt.verify(token, publicCert, { algorithms: ['RS512'] });
       if (decoded._doc.email === emailToVerify) {
         return true;
       } else {

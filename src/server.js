@@ -68,9 +68,6 @@ async function checkToken(req, res, next) {
   const email = req.body.email || req.query.email || req.headers['x-access-email'];
   const isTokenValid = await jwtUtils.isValidToken(token, email);
   if (isTokenValid === true) {
-    res.send(200, {
-      'msg': 'tokenValid'
-    });
     return next();
   } else {
     res.send(403, { 
@@ -80,12 +77,20 @@ async function checkToken(req, res, next) {
   }
 }
 
+async function getUser(req, res, next) {
+  const reqBody = req.body;
+  const userData = await userUtils.getUserData(reqBody.email);
+  res.send(200, userData);
+}
+
 const server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 server.get('/status', status);
 server.post('/register', register);
 server.post('/login', login);
 server.post('/checkToken', checkToken);
+server.use(checkToken);
+server.post('/getUser', getUser);
 
 server.listen(port, () => {
   console.log(`${server.name} listening at ${server.url}`);

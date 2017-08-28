@@ -36,7 +36,13 @@ async function login(email, password) {
   }
 }
 
+async function getUserData(email) {
+  const foundUser = await User.findOne({email: email});
+  return foundUser;
+}
+
 module.exports = {
   register: register,
-  login: login
+  login: login,
+  getUserData: getUserData
 };
