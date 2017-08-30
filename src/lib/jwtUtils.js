@@ -13,6 +13,17 @@ async function issueToken(userData) {
   return token;
 }
 
+async function decodeToken(token) {
+  console.log(`Running token decode with token ${token}`)
+  try {
+    const decoded = await jwt.verify(token, publicCert, { algorithms: ['RS512'] });
+    console.log(`Decoded data: ${decoded}`);
+    return decoded._doc
+  } catch (err) {
+    return err.message;
+  }
+}
+
 async function isValidToken(token, emailToVerify) {
   if (token) {
     try {
@@ -33,5 +44,6 @@ async function isValidToken(token, emailToVerify) {
 
 module.exports = {
   issueToken: issueToken,
+  decodeToken: decodeToken,
   isValidToken: isValidToken
 };
