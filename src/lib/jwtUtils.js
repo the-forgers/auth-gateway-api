@@ -14,10 +14,8 @@ async function issueToken(userData) {
 }
 
 async function decodeToken(token) {
-  console.log(`Running token decode with token ${token}`)
   try {
     const decoded = await jwt.verify(token, publicCert, { algorithms: ['RS512'] });
-    console.log(`Decoded data: ${decoded}`);
     return decoded._doc
   } catch (err) {
     return err.message;

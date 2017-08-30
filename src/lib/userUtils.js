@@ -6,7 +6,6 @@ async function register(firstName, lastName, email, password) {
   let userToRegister = null;
   let hPassword = null;
   hPassword = await auth.generatePassword(password);
-  console.log(hPassword);
   userToRegister = {
     firstName: firstName,
     lastName: lastName,
