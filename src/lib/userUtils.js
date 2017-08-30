@@ -23,7 +23,11 @@ async function login(email, password) {
     const doesPasswordMatch = await auth.checkPassword(password, dbHashedPassword);
     if (doesPasswordMatch === true) {
       console.log(`User with email ${email} has supplied correct password`);
-      const token = await jwtUtils.issueToken(foundUser);
+      const userDataToSign = {
+        email: foundUser.email,
+        mongoDbId: foundUser._id
+      };
+      const token = await jwtUtils.issueToken(userDataToSign);
       return token;
     } else {
       console.log(`User with email ${email} has supplied incorrect password`);
