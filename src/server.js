@@ -70,22 +70,21 @@ async function checkToken(req, res, next) {
   const token = req.body.token || req.query.token || req.headers['x-access-token'];
   const email = req.body.email || req.query.email || req.headers['x-access-email'];
   const isTokenValid = await jwtUtils.isValidToken(token, email);
-  const doesTokenExist = await tokenStore.doesKeyExist(email);
-  if (doesTokenExist === 1 && isTokenValid === true) {
-    console.log(`Email in check token is ${email}`);
+  const tokenFromStore = await tokenStore.getToken(email);
+  const doesTokenMatch = token === tokenFromStore;
+  if (doesTokenMatch === true && isTokenValid === true) {
     req.userEmail = email;  // TODO: need to be an decoded email
     return next();
   } else {
     res.send(403, { 
       'msg': 'tokenInValid',
-      'doesTokenExist': doesTokenExist,
+      'doesTokenMatch': doesTokenMatch,
       'isTokenValid': isTokenValid
     });
   }
 }
 
 async function getUser(req, res, next) {
-  console.log(req.headers);
   const reqBody = req.body;
   const gToken = await tokenStore.getToken(reqBody.email);
   const ttl = await tokenStore.getTTL(reqBody.email);
