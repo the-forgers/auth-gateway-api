@@ -19,8 +19,9 @@ Not just yet, but hopefully soon.
 * NodeJS version >= 8.4.x installed
 * npm version >= 5.3.x installed
 * A mongodb instance at version >= 3.4.x installed
+* A redis instance at version >= 4.0.x installed
 * An RSA public and private key `ssh-keygen -t rsa -b 2048`
-* A public certificate generated from the above public key `ssh-keygen -f auth-gateway.pub -e -m pem > auth_pub.pem`
+* A public certificate generated from the above public key `ssh-keygen -f my_public_key.pub -e -m pem > auth-gateway-cert.pem`
 
 ### How do I install? ###
 

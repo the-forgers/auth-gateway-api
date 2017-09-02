@@ -8,6 +8,7 @@
     "npm": "5.3.x"
   },
   "scripts": {
+    "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
