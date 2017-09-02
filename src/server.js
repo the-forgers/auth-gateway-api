@@ -67,39 +67,48 @@ async function login(req, res, next) {
 }
 
 async function checkToken(req, res, next) {
-  const token = req.body.token || req.query.token || req.headers['x-access-token'];
-  const email = req.body.email || req.query.email || req.headers['x-access-email'];
-  const isTokenValid = await jwtUtils.isValidToken(token, email);
-  const tokenFromStore = await tokenStore.getToken(email);
-  const doesTokenMatch = token === tokenFromStore;
-  if (doesTokenMatch === true && isTokenValid === true) {
-    req.userEmail = email;  // TODO: need to be an decoded email
-    return next();
+  const token = req.headers['x-access-token'];
+  const decodedToken = await jwtUtils.decodeToken(token);
+
+  if (decodedToken.error === null) {
+    const decodedEmail = decodedToken.data.email;
+    const tokenFromStore = await tokenStore.getToken(decodedEmail);
+    const doesTokenMatchStore = token === tokenFromStore;
+    if (doesTokenMatchStore === true) {
+      req.decodedToken = decodedToken;
+      return next();
+    } else {
+      res.send(403, { 
+        'msg': 'tokenNonExistant',
+        'doesTokenMatchStore': doesTokenMatchStore
+      });
+    }
   } else {
     res.send(403, { 
       'msg': 'tokenInValid',
-      'doesTokenMatch': doesTokenMatch,
-      'isTokenValid': isTokenValid
+      'decodedToken': decodedToken
     });
   }
 }
 
 async function getUser(req, res, next) {
-  const reqBody = req.body;
-  const gToken = await tokenStore.getToken(reqBody.email);
-  const ttl = await tokenStore.getTTL(reqBody.email);
-  const userData = await userUtils.getUserData(reqBody.email);
+  const decodedToken = req.decodedToken;
+  const userEmail = decodedToken.data.email;
+  const gToken = await tokenStore.getToken(userEmail);
+  const ttl = await tokenStore.getTTL(userEmail);
+  const userData = await userUtils.getUserData(userEmail);
   res.send(200, userData);
   next();
 }
 
 function logout(req, res, next) {
-  const email = req.userEmail;
-  console.log(`Logging out ${email}`);
-  tokenStore.expireTokenImmediately(email);
+  const decodedToken = req.decodedToken;
+  const userEmail = decodedToken.data.email;
+  console.log(`Logging out ${userEmail}`);
+  tokenStore.expireTokenImmediately(userEmail);
   res.send(200, { 
     'msg': 'logged out',
-    'user': email
+    'user': userEmail
   });
 }
 
@@ -110,7 +119,7 @@ server.post('/register', register);
 server.post('/login', login);
 server.post('/checkToken', checkToken);
 server.use(checkToken);
-server.post('/getUser', getUser);
+server.get('/getUser', getUser);
 server.post('/logout', logout);
 
 server.listen(port, () => {

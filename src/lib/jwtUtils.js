@@ -14,34 +14,20 @@ async function issueToken(userData) {
 }
 
 async function decodeToken(token) {
+  let payload = {};
   try {
     const decoded = await jwt.verify(token, publicCert, { algorithms: ['RS512'] });
-    return decoded;
+    payload.data = decoded;
+    payload.error = null;
+    return payload;
   } catch (err) {
-    return err.message;
-  }
-}
-
-async function isValidToken(token, emailToVerify) {
-  if (token) {
-    try {
-      const decoded = await jwt.verify(token, publicCert, { algorithms: ['RS512'] });
-      if (decoded.email === emailToVerify) {
-        return true;
-      } else {
-        return false;
-      } 
-    } catch (err) {
-      return err.message;
-    }
-    return true;
-  } else {
-    return false;
+    payload.data = null;
+    payload.error = err;
+    return payload;
   }
 }
 
 module.exports = {
   issueToken: issueToken,
-  decodeToken: decodeToken,
-  isValidToken: isValidToken
+  decodeToken: decodeToken
 };
