@@ -4,16 +4,21 @@ const jwtUtils = require('./jwtUtils')
 
 async function register(firstName, lastName, email, password) {
   let userToRegister = null;
-  let hPassword = null;
-  hPassword = await auth.generatePassword(password);
-  userToRegister = {
-    firstName: firstName,
-    lastName: lastName,
-    email: email,
-    password: hPassword
+  let hashedPassword = null;
+  const existingUser = await getUserData(email);
+  if (existingUser === null) {
+    hashedPassword = await auth.generatePassword(password);
+    userToRegister = {
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: hashedPassword
+    }
+    userToSave = new User(userToRegister);
+    return await userToSave.save();
+  } else {
+    return null;
   }
-  userToSave = new User(userToRegister);
-  return await userToSave.save();
 }
 
 async function login(email, password) {

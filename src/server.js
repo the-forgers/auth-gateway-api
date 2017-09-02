@@ -37,7 +37,13 @@ async function register(req, res, next) {
   if (reqBody !== undefined && hasUserSuppliedRequiredDetails) {
     try {
       const savedUser = await userUtils.register(reqBody.firstName, reqBody.lastName, reqBody.email, reqBody.password);
-      res.send(201, savedUser);
+      if (savedUser !== null) {
+        res.send(201, savedUser);
+      } else {
+        res.send(400, {
+          'msg': `registrationFailure, the user with the email: ${reqBody.email} already exists`,
+        });
+      }
     } catch (err) {
       console.error(err);
       res.send(500, err);
