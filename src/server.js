@@ -33,36 +33,49 @@ function status(req, res, next) {
 
 async function register(req, res, next) {
   const reqBody = req.body
-  try {
-    const savedUser = await userUtils.register(reqBody.firstName, reqBody.lastName, reqBody.email, reqBody.password);
-    res.send(201, savedUser);
-  } catch (err) {
-    console.error(err);
-    res.send(500, err);
+  const hasUserSuppliedRequiredDetails = reqBody.firstName && reqBody.lastName && reqBody.email && reqBody.password;
+  if (reqBody !== undefined && hasUserSuppliedRequiredDetails) {
+    try {
+      const savedUser = await userUtils.register(reqBody.firstName, reqBody.lastName, reqBody.email, reqBody.password);
+      res.send(201, savedUser);
+    } catch (err) {
+      console.error(err);
+      res.send(500, err);
+    }
+  } else {
+    res.send(400, {
+      'msg': 'registrationFailure, insufficient details supplied',
+    });
   }
   return next();
 }
 
 async function login(req, res, next) {
   const reqBody = req.body;
-  try {
-    const loginToken = await userUtils.login(reqBody.email, reqBody.password);
-    if (loginToken !== null) {
-      req.email = reqBody.email
-      tokenStore.saveToken(reqBody.email, loginToken);
-      res.send(200, {
-        'msg': 'loginSuccess',
-        'token': loginToken
-      });
-    } else {
-      res.send(401, {
-        'msg': 'loginFailure, check username/password',
-        'token': loginToken
-      });
+  if (reqBody !== undefined) {
+    try {
+      const loginToken = await userUtils.login(reqBody.email, reqBody.password);
+      if (loginToken !== null) {
+        req.email = reqBody.email
+        tokenStore.saveToken(reqBody.email, loginToken);
+        res.send(200, {
+          'msg': 'loginSuccess',
+          'token': loginToken
+        });
+      } else {
+        res.send(401, {
+          'msg': 'loginFailure, check username/password',
+          'token': loginToken
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      res.send(500, err);
     }
-  } catch (err) {
-    console.error(err);
-    res.send(500, err);
+  } else {
+    res.send(400, {
+      'msg': 'loginFailure, no login details supplied',
+    });
   }
 }
 
