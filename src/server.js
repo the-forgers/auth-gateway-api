@@ -4,7 +4,7 @@ const port = 5000 || process.env.PORT;
 
 const userUtils = require('./lib/userUtils')
 const jwtUtils = require('./lib/jwtUtils')
-const tokenStore = require('./lib/tokenStore')
+const tokenCache = require('./lib/tokenCache')
 
 let mongoURI = 'mongodb://localhost/auth-gateway';
 
@@ -63,7 +63,7 @@ async function login(req, res, next) {
       const loginToken = await userUtils.login(reqBody.email, reqBody.password);
       if (loginToken !== null) {
         req.email = reqBody.email
-        tokenStore.saveToken(reqBody.email, loginToken);
+        tokenCache.saveToken(reqBody.email, loginToken);
         res.send(200, {
           'msg': 'loginSuccess',
           'token': loginToken
@@ -91,7 +91,7 @@ async function checkToken(req, res, next) {
 
   if (decodedToken.error === null) {
     const decodedEmail = decodedToken.data.email;
-    const tokenFromStore = await tokenStore.getToken(decodedEmail);
+    const tokenFromStore = await tokenCache.getToken(decodedEmail);
     const doesTokenMatchStore = token === tokenFromStore;
     if (doesTokenMatchStore === true) {
       req.decodedToken = decodedToken;
@@ -113,8 +113,8 @@ async function checkToken(req, res, next) {
 async function getUser(req, res, next) {
   const decodedToken = req.decodedToken;
   const userEmail = decodedToken.data.email;
-  const gToken = await tokenStore.getToken(userEmail);
-  const ttl = await tokenStore.getTTL(userEmail);
+  const gToken = await tokenCache.getToken(userEmail);
+  const ttl = await tokenCache.getTTL(userEmail);
   const userData = await userUtils.getUserData(userEmail);
   res.send(200, userData);
   next();
@@ -124,7 +124,7 @@ function logout(req, res, next) {
   const decodedToken = req.decodedToken;
   const userEmail = decodedToken.data.email;
   console.log(`Logging out ${userEmail}`);
-  tokenStore.expireTokenImmediately(userEmail);
+  tokenCache.expireTokenImmediately(userEmail);
   res.send(200, { 
     'msg': 'logged out',
     'user': userEmail

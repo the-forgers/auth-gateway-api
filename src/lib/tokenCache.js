@@ -1,6 +1,19 @@
 const redis = require("redis");
 const client = redis.createClient();
 
+client.on('connect', (err, data) => {
+  console.log('Connected to Redis');
+});
+
+client.on('error', (err, data) => {
+  if (err.code === 'ECONNREFUSED') {
+    console.error('Lost connection to Redis');
+  } else {
+    console.error(`An error with code: ${err.code} occurred`);
+    console.error(err);
+  }
+});
+
 const TOKEN_EXPIRATION_TIME = 1200 //in seconds
 
 function saveToken(email, token) {
