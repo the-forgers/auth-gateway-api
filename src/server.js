@@ -1,27 +1,9 @@
 const restify = require('restify');
-const mongoose = require('mongoose');
 const port = 5000 || process.env.PORT;
 
 const userUtils = require('./lib/userUtils')
 const jwtUtils = require('./lib/jwtUtils')
 const tokenCache = require('./lib/tokenCache')
-
-let mongoURI = 'mongodb://localhost/auth-gateway';
-
-if (process.env.MONGOLAB_URI) {
-    mongoURI = process.env.MONGOLAB_URI;
-} else if (process.env.MODE === 'TEST') {
-    mongoURI = 'mongodb://localhost/auth-gateway_TEST';
-}
-
-mongoose.connect(mongoURI, function(err) {
-    if (err) {
-        console.error(`Connection to DB (${mongoURI}) error: ${err} \n`);
-        process.exit(); //App needs db so we exit when not present
-    } else {
-        console.log(`Connection to DB (${mongoURI}) successful \n`);
-    }
-});
 
 function status(req, res, next) {
   const response = {
