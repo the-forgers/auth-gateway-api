@@ -7,7 +7,7 @@ function status(req, res, next) {
     'msg': 'welcome'
   };
   res.send(response);
-  next();
+  return next();
 }
 
 async function register(req, res, next) {
@@ -18,21 +18,24 @@ async function register(req, res, next) {
       const savedUser = await userUtils.register(reqBody.firstName, reqBody.lastName, reqBody.email, reqBody.password);
       if (savedUser !== null) {
         res.send(201, savedUser);
+        return next();
       } else {
         res.send(400, {
           'msg': `registrationFailure, the user with the email: ${reqBody.email} already exists`,
         });
+        return next();
       }
     } catch (err) {
       console.error(err);
       res.send(500, err);
+      return next();
     }
   } else {
     res.send(400, {
       'msg': 'registrationFailure, insufficient details supplied',
     });
+    return next();
   }
-  return next();
 }
 
 async function login(req, res, next) {
@@ -47,20 +50,24 @@ async function login(req, res, next) {
           'msg': 'loginSuccess',
           'token': loginToken
         });
+        return next();
       } else {
         res.send(401, {
           'msg': 'loginFailure, check username/password',
           'token': loginToken
         });
+        return next();
       }
     } catch (err) {
       console.error(err);
       res.send(500, err);
+      return next();
     }
   } else {
     res.send(400, {
       'msg': 'loginFailure, no login details supplied',
     });
+    return next();
   }
 }
 
@@ -80,12 +87,14 @@ async function checkToken(req, res, next) {
         'msg': 'tokenNonExistant',
         'doesTokenMatchStore': doesTokenMatchStore
       });
+      return next();
     }
   } else {
     res.send(403, { 
       'msg': 'tokenInValid',
       'decodedToken': decodedToken
     });
+    return next();
   }
 }
 
@@ -96,7 +105,7 @@ async function getUser(req, res, next) {
   const ttl = await tokenCache.getTTL(userEmail);
   const userData = await userUtils.getUserData(userEmail);
   res.send(200, userData);
-  next();
+  return next();
 }
 
 function logout(req, res, next) {
@@ -108,6 +117,7 @@ function logout(req, res, next) {
     'msg': 'logged out',
     'user': userEmail
   });
+  return next();
 }
 
 module.exports = {
