@@ -35,14 +35,14 @@
   "dependencies": {
     "restify": "~5.2.0",
     "bcrypt": "~1.0.3",
-    "mongoose": "~4.11.8",
-    "jsonwebtoken": "^7.4.3",
+    "mongoose": "~4.11.10",
+    "jsonwebtoken": "^8.0.0",
     "redis": "^2.8.0"
   },
   "devDependencies": {
     "jasmine": "^2.4.1",
     "jsdoc": "^3.4.0",
     "rimraf": "latest",
-    "supertest": "^1.1.0"
+    "supertest": "^3.0.0"
   }
 }
