@@ -9,7 +9,9 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf node_modules",
+    "refresh": "rimraf node_modules && npm i"
   },
   "repository": {
     "type": "git",
